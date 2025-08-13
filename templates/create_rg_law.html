@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resource Group and Log Analytics Workspace</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .form-group {
+            margin-bottom: 1.5em;
+        }
+        .radio-row {
+            display: flex;
+            align-items: center;
+            gap: 4em; /* Increased gap for more space between Yes and No */
+            margin-bottom: 0.5em;
+        }
+        .radio-pair {
+            display: flex;
+            align-items: center;
+            gap: 0.3em; /* Small gap between radio and label */
+        }
+        .radio-pair label {
+            margin: 0;
+            vertical-align: middle;
+        }
+        .radio-pair input[type="radio"] {
+            vertical-align: middle;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Resource Group and Log Analytics Workspace</h2>
+        <form method="post">
+            <div class="form-group">
+                <label>Do you need to create a new Resource Group?</label><br>
+                <div class="radio-row">
+                    <span class="radio-pair">
+                        <input type="radio" id="create_rg_yes" name="create_rg" value="yes" required>
+                        <label for="create_rg_yes">Yes</label>
+                    </span>
+                    <span class="radio-pair">
+                        <input type="radio" id="create_rg_no" name="create_rg" value="no">
+                        <label for="create_rg_no">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Do you need to create a new Log Analytics Workspace?</label><br>
+                <div class="radio-row">
+                    <span class="radio-pair">
+                        <input type="radio" id="create_law_yes" name="create_law" value="yes" required>
+                        <label for="create_law_yes">Yes</label>
+                    </span>
+                    <span class="radio-pair">
+                        <input type="radio" id="create_law_no" name="create_law" value="no">
+                        <label for="create_law_no">No</label>
+                    </span>
+                </div>
+            </div>
+            <button type="submit">Continue</button>
+        </form>
+    </div>
+</body>
+</html>

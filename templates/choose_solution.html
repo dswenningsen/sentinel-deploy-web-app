@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Solution</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        fieldset > div {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        fieldset label {
+            text-align: left;
+            margin: 0;
+            padding-left: 0.25em;
+            justify-self: start;
+        }
+        fieldset input[type="checkbox"] {
+            margin: 0;
+            justify-self: end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentinel Automation</h1>
+        <h2>Select one or more solutions to deploy:</h2>
+        <form method="post">
+            <fieldset>
+                <legend>Solutions:</legend>
+                {% for value, label in solutions %}
+                <div>
+                    <input type="checkbox" id="{{ value }}" name="solution" value="{{ value }}">
+                    <label for="{{ value }}">{{ label }}</label>
+                </div>
+                {% endfor %}
+            </fieldset>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

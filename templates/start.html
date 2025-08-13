@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start - Sentinel Automation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Sentinel Automation</h1>
+        <h2>Do you need to create a Sentinel Workspace?</h2>
+        <form method="post">
+            <div class="radio-group">
+                <label><input type="radio" id="yes" name="need_workspace" value="yes" required>Yes</label>
+                <label><input type="radio" id="no" name="need_workspace" value="no">No</label>
+            </div>
+            <button type="submit">Continue</button>
+        </form>
+    </div>
+</body>
+</html>

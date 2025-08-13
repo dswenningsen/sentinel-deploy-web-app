@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% if refresh %}
+    <meta http-equiv="refresh" content="3">
+    {% endif %}
+</head>
+<body>
+    <div class="container">
+        <h1>Operation Logs</h1>
+        <p>Status: <strong>{{ status }}</strong></p>
+        {% if error %}
+            <div class="logs error">
+                <p style="color: red; font-weight: bold;">An error occurred during workspace creation. Please check the logs below and try again.</p>
+            </div>
+        {% endif %}
+        <div class="logs">
+            {% if logs %}
+                {% for log in logs %}
+                    <p>{{ log }}</p>
+                {% endfor %}
+            {% else %}
+                <p>No logs available yet. Please refresh the page.</p>
+            {% endif %}
+        </div>
+        <a href="/" class="button">Back to Form</a>
+    </div>
+</body>
+</html>

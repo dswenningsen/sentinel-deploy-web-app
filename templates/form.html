@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Automation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Sentinel Automation</h1>
+        <form method="POST" action="/">
+            <label for="subscription_id">Subscription ID:</label>
+            <input type="text" id="subscription_id" name="subscription_id" required>
+
+            <label for="resource_group">Resource Group Name:</label>
+            <input type="text" id="resource_group" name="resource_group" required>
+
+            <label for="workspace_name">Workspace Name:</label>
+            <input type="text" id="workspace_name" name="workspace_name" required>
+
+            <label for="region">Region:</label>
+            <input type="text" id="region" name="region" required>
+
+            <label for="client_id">Client ID:</label>
+            <input type="text" id="client_id" name="client_id" required>
+
+            <label for="client_secret">Client Secret:</label>
+            <input type="password" id="client_secret" name="client_secret" required>
+
+            <label for="tenant_id">Tenant ID:</label>
+            <input type="text" id="tenant_id" name="tenant_id" required>
+
+            <button type="submit">Continue</button>
+        </form>
+    </div>
+</body>
+</html>
