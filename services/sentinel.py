@@ -122,7 +122,9 @@ def process_solutions_task(
             client_id=workspace_form["client_id"],
             client_secret=client_secret,
         )
-        sent_client.deploy_solutions(selected_solutions)
+        sent_client.deploy_solutions(
+            workspace_form["region"], selected_solutions
+        )
         logs.append("All selected solutions deployed successfully.")
         deployments[deployment_id]["logs"] = logs
         deployments[deployment_id]["status"] = "Completed"

@@ -23,55 +23,6 @@ def list_content_product_packages(self):
     )
 
 
-def list_content_packages(self):
-    """List content packages in the workspace"""
-    logger.info(
-        f"Listing installed content packages for workspace: {self.workspace_name}"
-    )
-    resource = self.api_url + f"contentPackages{self.api_version}"
-    logger.debug(f"GET {resource}")
-    response = requests.get(
-        url=resource,
-        headers=self.headers,
-        timeout=300,
-    )
-    return rc.response_check(
-        f"Error listing content packages in {self.workspace_name}", response
-    )
-
-
-def install_content_package(self, package_id: str, package_definition: dict):
-    """Install content package in the workspace"""
-    logger.info(f"Installing content package: {package_id}")
-    resource = self.api_url + f"contentPackages/{package_id}{self.api_version}"
-    response = requests.put(
-        url=resource,
-        headers=self.headers,
-        json=package_definition,
-        timeout=300,
-    )
-    return rc.response_check(
-        f"Error listing content packages in {self.workspace_name}", response
-    )
-
-
-def prepare_package_body(package: dict):
-    """Prepare the package body for installation"""
-    logger.info(f"Preparing package body for: {package['name']}")
-    return {
-        "properties": {
-            "contentId": package["properties"]["contentId"],
-            "contentKind": package["properties"]["contentKind"],
-            "contentProductId": package["properties"]["contentProductId"],
-            "contentSchemaVersion": package["properties"][
-                "contentSchemaVersion"
-            ],
-            "displayName": package["properties"]["displayName"],
-            "version": package["properties"]["version"],
-        }
-    }
-
-
 def get_content_product_package(self, package_name: str):
     """Get details of a specific content product package"""
     logger.info(f"Getting content product package details for: {package_name}")
@@ -156,7 +107,9 @@ def deploy_solution_content(self, package_body: dict, deploy_name: str):
     )
 
 
-def full_solution_deploy(self, desired_solutions: list = None):
+def full_solution_deploy(
+    self, ws_location: str, desired_solutions: list = None
+):
     logger.info(f"Starting full solution deployment")
     # Get all possible solutions that can be deployed
     prod_packages = list_content_product_packages(self)
@@ -198,7 +151,7 @@ def full_solution_deploy(self, desired_solutions: list = None):
             "properties": {
                 "parameters": {
                     "workspace": {"value": self.workspace_name},
-                    "workspace-location": {"value": "westus"},
+                    "workspace-location": {"value": ws_location},
                 },
                 "template": product_package["properties"]["packagedContent"],
                 "mode": "Incremental",
@@ -220,3 +173,55 @@ def full_solution_deploy(self, desired_solutions: list = None):
             continue
         logger.info(f"Resource {package_name} deployed successfully.")
     return prod_packages
+
+
+# Not currently used
+# __________________________________________
+# def list_content_packages(self):
+#     """List content packages in the workspace"""
+#     logger.info(
+#         f"Listing installed content packages for workspace: {self.workspace_name}"
+#     )
+#     resource = self.api_url + f"contentPackages{self.api_version}"
+#     logger.debug(f"GET {resource}")
+#     response = requests.get(
+#         url=resource,
+#         headers=self.headers,
+#         timeout=300,
+#     )
+#     return rc.response_check(
+#         f"Error listing content packages in {self.workspace_name}", response
+#     )
+
+# def install_content_package(self, package_id: str, package_definition: dict):
+#     """Install content package in the workspace"""
+#     logger.info(f"Installing content package: {package_id}")
+#     resource = self.api_url + f"contentPackages/{package_id}{self.api_version}"
+#     response = requests.put(
+#         url=resource,
+#         headers=self.headers,
+#         json=package_definition,
+#         timeout=300,
+#     )
+#     return rc.response_check(
+#         f"Error listing content packages in {self.workspace_name}", response
+#     )
+
+# def prepare_package_body(package: dict):
+# """Prepare the package body for installation"""
+# logger.info(f"Preparing package body for: {package['name']}")
+# return {
+#     "properties": {
+#         "contentId": package["properties"]["contentId"],
+#         "contentKind": package["properties"]["contentKind"],
+#         "contentProductId": package["properties"]["contentProductId"],
+#         "contentSchemaVersion": package["properties"][
+#             "contentSchemaVersion"
+#         ],
+#         "displayName": package["properties"]["displayName"],
+#         "version": package["properties"]["version"],
+#     }
+# }
+
+
+# __________________________________________
