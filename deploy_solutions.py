@@ -133,9 +133,34 @@ def install_content_template(self, template_id: str, template_body: dict):
     )
 
 
+def deploy_solution_content(self, package_body: dict, deploy_name: str):
+    logger.info(
+        f"Deploying solution content with deployment name: {deploy_name}"
+    )
+    resource = (
+        f"https://management.azure.com/subscriptions/{self.subscription_id}/"
+        f"resourceGroups/{self.resource_group_name}/"
+        f"providers/Microsoft.Resources/deployments/{deploy_name}"
+        "?api-version=2025-04-01"
+    )
+    logger.debug(f"PUT {resource}")
+    response = requests.put(
+        url=resource,
+        headers=self.headers,
+        json=package_body,
+        timeout=300,
+    )
+    return rc.response_check(
+        f"Error deploying solution content with deployment name: {deploy_name} in {self.workspace_name}",
+        response,
+    )
+
+
 def full_solution_deploy(self, desired_solutions: list = None):
     logger.info(f"Starting full solution deployment")
+    # Get all possible solutions that can be deployed
     prod_packages = list_content_product_packages(self)
+    # Filter to only those we want to deploy
     prod_packages = [
         package
         for package in prod_packages["value"]
@@ -145,16 +170,7 @@ def full_solution_deploy(self, desired_solutions: list = None):
     for package in prod_packages:
         package_name = package["properties"]["displayName"]
         logger.info(f"Deploying package: {package_name}")
-        package_body = prepare_package_body(package)
-        installed_package = install_content_package(
-            self, package["properties"]["contentId"], package_body
-        )
-        if not installed_package:
-            logger.error(
-                f"Failed to install package: {package_name}. Check logs for details."
-            )
-            continue
-        logger.info(f"Installed {package_name} package successfully.")
+        # Get the solution and all of its content
         product_package = get_content_product_package(self, package["name"])
         if not product_package:
             logger.error(
@@ -162,25 +178,45 @@ def full_solution_deploy(self, desired_solutions: list = None):
                 f"for: {package_name}. Check logs for details."
             )
             continue
+
+        # Remove invalid characters
         full_resources = product_package["properties"]["packagedContent"][
             "resources"
         ]
-        source = product_package["properties"]["source"]
-        # TODO add in ability to deploy data connectors properly
         for resource in full_resources:
-            if not resource["type"].endswith("contentTemplates"):
-                continue
-            resource_name = resource["properties"]["id"]
-            logger.info(f"Deploying resource: {resource_name}")
-            template_body = prepare_template_body(resource, source)
-            install_result = install_content_template(
-                self, resource["properties"]["contentProductId"], template_body
+            if (
+                "mainTemplate" in resource["properties"].keys()
+                and "metadata" in resource["properties"]["mainTemplate"].keys()
+                and "postDeployment"
+                in resource["properties"]["mainTemplate"]["metadata"].keys()
+            ):
+                resource["properties"]["mainTemplate"]["metadata"][
+                    "postDeployment"
+                ] = None
+        # Prepare the body for deployment
+        package_content_body = {
+            "properties": {
+                "parameters": {
+                    "workspace": {"value": self.workspace_name},
+                    "workspace-location": {"value": "westus"},
+                },
+                "template": product_package["properties"]["packagedContent"],
+                "mode": "Incremental",
+            }
+        }
+        # Create deployment name, max length is 64 characters
+        deploy_name = f"deploy-{package_name.replace(' ', '-')}"
+        if len(deploy_name) > 64:
+            deploy_name = deploy_name[:64]
+        # Deploy the solution and all of its contents
+        install_result = deploy_solution_content(
+            self, package_content_body, deploy_name
+        )
+        if not install_result:
+            logger.error(
+                f"Failed to deploy resource: {package_name}."
+                " Check logs for details."
             )
-            if not install_result:
-                logger.error(
-                    f"Failed to deploy resource: {resource_name}."
-                    " Check logs for details."
-                )
-                continue
-            logger.info(f"Resource {resource_name} deployed successfully.")
+            continue
+        logger.info(f"Resource {package_name} deployed successfully.")
     return prod_packages

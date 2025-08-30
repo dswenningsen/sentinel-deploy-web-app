@@ -4,3 +4,4 @@ pydantic
 PyGithub
 flask
 PyYAML
+gunicorn
