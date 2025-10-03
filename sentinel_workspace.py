@@ -49,7 +49,7 @@ class SentinelWorkspace:
         self.client = si.SecurityInsights(
             credential=self.credential, subscription_id=self.subscription_id
         )
-        self.api_version = "?api-version=2025-04-01-preview"
+        self.api_version = "?api-version=2025-07-01-preview"
         self.api_url = (
             f"https://management.azure.com/subscriptions/{self.subscription_id}/"
             f"resourceGroups/{self.resource_group_name}/"

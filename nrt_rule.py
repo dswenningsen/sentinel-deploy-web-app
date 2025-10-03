@@ -10,16 +10,61 @@ Reference: https://learn.microsoft.com/en-us/rest/api/securityinsights/
 # pylint: disable=C0103, R0903, E0401, E0213
 from pydantic import Field, model_validator
 from pydantic.json_schema import SkipJsonSchema
-import nrt_rule_template as nrt
-import scheduled_rule_template as srt
+from typing import List
+from enum import Enum
 
 
-class NrtAlertRuleProperties(nrt.NrtRuleTemplateProperties):
+# TODO: class AlertDetailsOverride
+class AlertDetailsOverride:
+    a = 1
+
+
+# TODO: EntityMapping
+class EntityMapping:
+    a = 1
+
+
+# TODO: EventGroupingSettings
+class EventGroupingSettings:
+    a = 1
+
+
+# TODO: IncidentConfiguration
+class IncidentConfiguration:
+    a = 1
+
+
+# TODO: SentinelEntityMapping
+class SentinelEntityMapping:
+    a = 1
+
+
+# TODO: AttackTactic
+class AttackTactic:
+    a = 1
+
+
+class NrtAlertRuleProperties:
     """Model"""
 
     displayName: str
+    enabled: bool = Field(default=False)
+    query: str
+    severity: str
+    suppressionDuration: str
+    suppressionEnabled: bool
+    alertDetailsOverride: AlertDetailsOverride | None = None
+    alertRuleTemplateName: str | None = None
+    customDetails: dict | None = None
+    description: str | None = None
+    entityMappings: List[EntityMapping] | None = None
+    eventGroupingSettings: EventGroupingSettings | None
+    incidentConfiguration: IncidentConfiguration | None = None
+    sentinelEntitiesMappings: List[SentinelEntityMapping] | None
+    subTechniques: str | None = None
+    tactics: AttackTactic | None = None
+    techniques: str | None = None
     templateVersion: str | None
-    version: SkipJsonSchema[str | None] = Field(default=None, exclude=True)
 
     @model_validator(mode="before")
     def alter_templateVersion(cls, values):
@@ -35,23 +80,9 @@ class NrtAlertRuleProperties(nrt.NrtRuleTemplateProperties):
             return values
 
 
-class NrtAlertRule(nrt.NrtRuleTemplate):
+class NrtAlertRule:
     """Model"""
 
     kind: str = Field(default="NRT")
     properties: NrtAlertRuleProperties
-    displayName: SkipJsonSchema[str | None] = Field(default=None, exclude=True)
-    alertRulesCreatedByTemplateCount: SkipJsonSchema[int | None] = Field(
-        default=None, exclude=True
-    )
-    createdDateUTC: SkipJsonSchema[str | None] = Field(
-        default=None, exclude=True
-    )
-    description: SkipJsonSchema[str | None] = Field(default=None, exclude=True)
-    lastUpdatedDateUTC: SkipJsonSchema[str | None] = Field(
-        default=None, exclude=True
-    )
-    name: SkipJsonSchema[str] = Field(default=None, exclude=True)
-    status: SkipJsonSchema[srt.TemplateStatus | None] = Field(
-        default=None, exclude=True
-    )
+    etag: str | None = None
