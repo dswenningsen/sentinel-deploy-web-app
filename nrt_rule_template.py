@@ -15,6 +15,7 @@ import scheduled_rule_template as srt
 class NrtRuleTemplateProperties(srt.ScheduledAlertRuleTemplateProperties):
     """Model"""
 
+    # TODO: Rewrite to not inherit from scheduled rule template
     queryFrequency: SkipJsonSchema[str] = Field(default=None, exclude=True)
     queryPeriod: SkipJsonSchema[str] = Field(default=None, exclude=True)
     displayName: SkipJsonSchema[str] = Field(default=None, exclude=True)
@@ -28,6 +29,7 @@ class NrtRuleTemplateProperties(srt.ScheduledAlertRuleTemplateProperties):
 class NrtRuleTemplate(srt.ScheduledAlertRuleTemplate):
     """Model"""
 
+    # TODO: Rewrite to not inherit from scheduled rule template
     alertRulesCreatedByTemplateCount: int | None = None
     createdDateUTC: str | None = None
     description: str | None = None
