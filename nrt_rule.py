@@ -7,41 +7,13 @@ Reference: https://learn.microsoft.com/en-us/rest/api/securityinsights/
             2024-01-01-preview&tabs=HTTP#nrtalertrule
 """
 
-# pylint: disable=C0103, R0903, E0401, E0213
-from pydantic import Field, model_validator
-from pydantic.json_schema import SkipJsonSchema
+# pylint: disable=E0213, R0903
 from typing import List
-from enum import Enum
-
-
-# TODO: class AlertDetailsOverride
-class AlertDetailsOverride:
-    a = 1
-
-
-# TODO: EntityMapping
-class EntityMapping:
-    a = 1
-
-
-# TODO: EventGroupingSettings
-class EventGroupingSettings:
-    a = 1
-
-
-# TODO: IncidentConfiguration
-class IncidentConfiguration:
-    a = 1
-
-
-# TODO: SentinelEntityMapping
-class SentinelEntityMapping:
-    a = 1
-
-
-# TODO: AttackTactic
-class AttackTactic:
-    a = 1
+from pydantic import (
+    Field,
+    model_validator,
+)
+import scheduled_rule as sr
 
 
 class NrtAlertRuleProperties:
@@ -50,24 +22,24 @@ class NrtAlertRuleProperties:
     displayName: str
     enabled: bool = Field(default=False)
     query: str
-    severity: str
+    severity: sr.AlertSeverity
     suppressionDuration: str
     suppressionEnabled: bool
-    alertDetailsOverride: AlertDetailsOverride | None = None
+    alertDetailsOverride: sr.AlertDetailsOverride | None = None
     alertRuleTemplateName: str | None = None
     customDetails: dict | None = None
     description: str | None = None
-    entityMappings: List[EntityMapping] | None = None
-    eventGroupingSettings: EventGroupingSettings | None
-    incidentConfiguration: IncidentConfiguration | None = None
-    sentinelEntitiesMappings: List[SentinelEntityMapping] | None
+    entityMappings: List[sr.EntityMapping] | None = None
+    eventGroupingSettings: sr.EventGroupingSettings | None
+    incidentConfiguration: sr.IncidentConfiguration | None = None
+    sentinelEntitiesMappings: List[sr.SentinelEntityMapping] | None
     subTechniques: str | None = None
-    tactics: AttackTactic | None = None
+    tactics: sr.AttackTactic | None = None
     techniques: str | None = None
     templateVersion: str | None
 
     @model_validator(mode="before")
-    def alter_templateVersion(cls, values):
+    def alter_template_version(cls, values):
         """Alter templateVersion to version."""
         try:
             if (
