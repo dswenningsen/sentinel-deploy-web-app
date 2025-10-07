@@ -40,6 +40,8 @@ class ScheduledAlertRuleTemplateProperties(sr.ScheduledAlertRuleProperties):
     suppressionDuration: SkipJsonSchema[str] = Field(default="PT5M")
     requiredDataConnectors: List[AlertRuleTemplateDataSources] | None = None
     status: TemplateStatus | None = None
+
+    # TODO: Does this need to be a SkipJsonSchema?
     version: SkipJsonSchema[str | None] = Field(default=None, exclude=True)
 
     @model_validator(mode="before")

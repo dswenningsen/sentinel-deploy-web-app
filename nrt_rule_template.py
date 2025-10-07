@@ -6,35 +6,34 @@ Reference: https://learn.microsoft.com/en-us/rest/api/securityinsights/
             2024-01-01-preview&tabs=HTTP#nrtalertrule
 """
 
-from typing import List
-from pydantic import Field
+from typing import List, Dict
+from pydantic import Field, BaseModel
 from pydantic.json_schema import SkipJsonSchema
+import scheduled_rule as sr
 import scheduled_rule_template as srt
 
 
-class NrtRuleTemplateProperties(srt.ScheduledAlertRuleTemplateProperties):
+class NrtRuleTemplateProperties(BaseModel):
     """Model"""
 
-    # TODO: Rewrite to not inherit from scheduled rule template
-    queryFrequency: SkipJsonSchema[str] = Field(default=None, exclude=True)
-    queryPeriod: SkipJsonSchema[str] = Field(default=None, exclude=True)
-    displayName: SkipJsonSchema[str] = Field(default=None, exclude=True)
-    status: SkipJsonSchema[srt.TemplateStatus] = Field(
-        default=None, exclude=True
-    )
-    triggerOperator: SkipJsonSchema[str] = Field(default=None, exclude=True)
-    triggerThreshold: SkipJsonSchema[int] = Field(default=None, exclude=True)
-
-
-class NrtRuleTemplate(srt.ScheduledAlertRuleTemplate):
-    """Model"""
-
-    # TODO: Rewrite to not inherit from scheduled rule template
-    alertRulesCreatedByTemplateCount: int | None = None
-    createdDateUTC: str | None = None
-    description: str | None = None
-    displayName: str | None = None
-    lastUpdatedDateUTC: str | None = None
-    status: srt.TemplateStatus | None = None
-    properties: NrtRuleTemplateProperties
+    alertDetailsOverride: sr.AlertDetailsOverride | None = None
+    customDetails: Dict[str, str] | None = None
+    entityMappings: List[sr.EntityMapping] | None = None
+    eventGroupingSettings: sr.EventGroupingSettings | None = None
+    query: str
+    sentinelEntitiesMappings: List[sr.SentinelEntityMapping] | None = None
+    severity: sr.AlertSeverity
+    tactics: List[sr.AttackTactic] | None = None
+    techniques: List[str] | None = None
+    version: str
     requiredDataConnectors: List[srt.AlertRuleTemplateDataSources] | None = None
+    status: srt.TemplateStatus | None = None
+
+
+class NrtRuleTemplate(BaseModel):
+    """Model"""
+
+    kind: str = Field(default="NRT")
+    displayName: str
+    description: str | None = None
+    properties: NrtRuleTemplateProperties

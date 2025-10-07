@@ -10,13 +10,14 @@ Reference: https://learn.microsoft.com/en-us/rest/api/securityinsights/
 # pylint: disable=E0213, R0903
 from typing import List
 from pydantic import (
+    BaseModel,
     Field,
     model_validator,
 )
 import scheduled_rule as sr
 
 
-class NrtAlertRuleProperties:
+class NrtAlertRuleProperties(BaseModel):
     """Model"""
 
     displayName: str
@@ -52,7 +53,7 @@ class NrtAlertRuleProperties:
             return values
 
 
-class NrtAlertRule:
+class NrtAlertRule(BaseModel):
     """Model"""
 
     kind: str = Field(default="NRT")
