@@ -8,7 +8,6 @@ Reference: https://learn.microsoft.com/en-us/rest/api/securityinsights/
 
 from typing import List, Dict
 from pydantic import Field, BaseModel
-from pydantic.json_schema import SkipJsonSchema
 import scheduled_rule as sr
 import scheduled_rule_template as srt
 

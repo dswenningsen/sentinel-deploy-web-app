@@ -11,7 +11,7 @@ from flask import (
     url_for,
     session,
 )
-from app_logging import logger
+from src.app_logging import logger
 from services.sentinel import create_workspace_task
 
 workspace_bp = Blueprint("workspace", __name__)

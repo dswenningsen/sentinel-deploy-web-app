@@ -1,7 +1,7 @@
 """
 Pydantic model for Scheduled Alert Rule in Microsoft Sentinel
 This model is used to define the properties and structure of a scheduled alert
-rule in Microsoft Sentinel.
+rule template in Microsoft Sentinel.
 Reference:
     https://learn.microsoft.com/en-us/rest/api/securityinsights/
         alert-rule-templates/get?view=rest-securityinsights-2024-01-01-preview&
@@ -32,6 +32,7 @@ class TemplateStatus(str, Enum):
     NotAvailable = "NotAvailable"
 
 
+# TODO: Fix inheritance
 class ScheduledAlertRuleTemplateProperties(sr.ScheduledAlertRuleProperties):
     """Model"""
 

@@ -7,7 +7,7 @@ import app_logging as al
 import scheduled_rule_template as srt
 import nrt_rule_template as nrt
 
-# pylint: disable=W1203
+# pylint: disable=W1203, W0718
 
 SENTINEL_REPO = "Azure/Azure-Sentinel"
 REPO_FOLDER = "Solutions"

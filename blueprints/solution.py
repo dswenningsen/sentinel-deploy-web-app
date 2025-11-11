@@ -2,8 +2,6 @@
 
 import uuid
 import threading
-import glob
-import yaml
 from flask import (
     Blueprint,
     render_template,
@@ -12,7 +10,7 @@ from flask import (
     url_for,
     session,
 )
-from app_logging import logger
+from src.app_logging import logger
 from services.sentinel import process_solutions_task
 
 # pylint: disable=W1203
@@ -81,7 +79,6 @@ def monitor_solution(deployment_id):
     if not deployment:
         logger.error(f"Deployment not found: {deployment_id}")
         return "Deployment not found.", 404
-    error_detected = any("error" in log.lower() for log in deployment["logs"])
     if deployment["status"] == "Completed":
         logger.info(f"Deployment {deployment_id} completed successfully.")
         return render_template(

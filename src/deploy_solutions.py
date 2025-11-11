@@ -1,3 +1,5 @@
+"""Deploy and manage content product solutions in a workspace"""
+
 import requests
 import response_checker as rc
 from app_logging import logger
@@ -6,7 +8,7 @@ from app_logging import logger
 # pylint: disable=W1203
 def list_content_product_packages(self):
     """List content product solutions available to the workspace"""
-    logger.info(f"Listing all available content product packages")
+    logger.info("Listing all available content product packages")
     query_filter = "$filter=properties/contentKind eq 'Solution'"
     resource = (
         self.api_url
@@ -85,6 +87,7 @@ def install_content_template(self, template_id: str, template_body: dict):
 
 
 def deploy_solution_content(self, package_body: dict, deploy_name: str):
+    """Deploy solution content to the workspace"""
     logger.info(
         f"Deploying solution content with deployment name: {deploy_name}"
     )
@@ -102,7 +105,8 @@ def deploy_solution_content(self, package_body: dict, deploy_name: str):
         timeout=300,
     )
     return rc.response_check(
-        f"Error deploying solution content with deployment name: {deploy_name} in {self.workspace_name}",
+        "Error deploying solution content with deployment name: "
+        f"{deploy_name} in {self.workspace_name}",
         response,
     )
 
@@ -110,7 +114,8 @@ def deploy_solution_content(self, package_body: dict, deploy_name: str):
 def full_solution_deploy(
     self, ws_location: str, desired_solutions: list = None
 ):
-    logger.info(f"Starting full solution deployment")
+    """Deploy all desired solutions to the workspace"""
+    logger.info("Starting full solution deployment")
     # Get all possible solutions that can be deployed
     prod_packages = list_content_product_packages(self)
     # Filter to only those we want to deploy
@@ -119,7 +124,7 @@ def full_solution_deploy(
         for package in prod_packages["value"]
         if package["properties"]["displayName"] in desired_solutions
     ]
-    logger.info(f"Filtered packages to deploy")
+    logger.info("Filtered packages to deploy")
     for package in prod_packages:
         package_name = package["properties"]["displayName"]
         logger.info(f"Deploying package: {package_name}")
