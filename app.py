@@ -24,3 +24,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# TODO: requiredDataConnectors is not being written to file

@@ -126,7 +126,6 @@ class AlertDetailsOverride(BaseModel):
     alertDescriptionFormat: str | None = None
     alertSeverityColumnName: str | None = None
     alertTacticsColumnName: str | None = None
-    alertTechniquesColumnName: str | None = None
     alertDynamicProperties: List[AlertPropertyMapping] | None = None
 
 

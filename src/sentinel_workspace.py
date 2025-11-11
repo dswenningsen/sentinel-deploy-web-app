@@ -49,7 +49,7 @@ class SentinelWorkspace:
         self.client = si.SecurityInsights(
             credential=self.credential, subscription_id=self.subscription_id
         )
-        self.api_version = "?api-version=2025-04-01-preview"
+        self.api_version = "?api-version=2025-07-01-preview"
         self.api_url = (
             f"https://management.azure.com/subscriptions/{self.subscription_id}/"
             f"resourceGroups/{self.resource_group_name}/"
@@ -63,6 +63,25 @@ class SentinelWorkspace:
         }
 
     deploy_solutions = deploy_solutions.full_solution_deploy
+
+    def list_rule_content_templates(self):
+        """Lists rule content templates in the workspace"""
+        al.logger.info("Listing content templates")
+        resource = (
+            self.api_url + f"contentTemplates/{self.api_version}"
+            "&%24filter=(properties%2FcontentKind%20eq%20'AnalyticsRule')"
+            "&$expand=properties/mainTemplate"
+        )
+        al.logger.debug(f"GET {resource}")
+        response = requests.get(
+            url=resource,
+            headers=self.headers,
+            timeout=300,
+        )
+        return rc.response_check(
+            f"Error listing rule content templates in {self.workspace_name}",
+            response,
+        )
 
     def get_access_token(self, scope: str):
         """
