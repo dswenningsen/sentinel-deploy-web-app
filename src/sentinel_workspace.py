@@ -14,6 +14,7 @@ import src.scheduled_rule as sr
 import src.nrt_rule as nr
 import src.response_checker as rc
 import src.deploy_solutions
+import src.deploy_rules
 
 # pylint: disable=W1203
 
@@ -63,6 +64,7 @@ class SentinelWorkspace:
         }
 
     deploy_solutions = src.deploy_solutions.full_solution_deploy
+    deploy_rules = src.deploy_rules.deploy_alert_rules
 
     def list_rule_content_templates(self):
         """Lists rule content templates in the workspace"""

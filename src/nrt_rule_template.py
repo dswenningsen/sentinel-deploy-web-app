@@ -8,8 +8,8 @@ Reference: https://learn.microsoft.com/en-us/rest/api/securityinsights/
 
 from typing import List, Dict
 from pydantic import Field, BaseModel
-import scheduled_rule as sr
-import scheduled_rule_template as srt
+import src.scheduled_rule as sr
+import src.scheduled_rule_template as srt
 
 
 class NrtRuleTemplateProperties(BaseModel):
@@ -27,12 +27,15 @@ class NrtRuleTemplateProperties(BaseModel):
     version: str
     requiredDataConnectors: List[srt.AlertRuleTemplateDataSources] | None = None
     status: srt.TemplateStatus | None = None
+    description: str | None = None
+    displayName: str
 
 
 class NrtRuleTemplate(BaseModel):
     """Model"""
 
+    id: str | None = None
+    name: str | None = None
+    type: str | None = None
     kind: str = Field(default="NRT")
-    displayName: str
-    description: str | None = None
     properties: NrtRuleTemplateProperties

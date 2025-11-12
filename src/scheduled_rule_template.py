@@ -20,7 +20,7 @@ from pydantic import (
     field_validator,
     ValidationError,
 )
-import scheduled_rule as sr
+import src.scheduled_rule as sr
 
 
 class AlertRuleTemplateDataSources(BaseModel):
@@ -65,7 +65,7 @@ class ScheduledAlertRuleTemplateProperties(BaseModel):
 
         use_enum_values = True
 
-    @field_serializer("queryFrequency", "queryPeriod", "suppressionDuration")
+    @field_serializer("queryFrequency", "queryPeriod")
     def serialize_duration(self, v: str) -> str:
         """validate"""
         return sr.to_iso8601_duration(v)

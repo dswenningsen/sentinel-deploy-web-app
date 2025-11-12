@@ -4,8 +4,9 @@ import requests
 import src.response_checker as rc
 from src.app_logging import logger
 
-
 # pylint: disable=W1203
+
+
 def list_content_product_packages(self):
     """List content product solutions available to the workspace"""
     logger.info("Listing all available content product packages")
