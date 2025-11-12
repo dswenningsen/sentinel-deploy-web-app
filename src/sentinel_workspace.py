@@ -9,11 +9,11 @@ import uuid
 import requests
 from azure.identity import DefaultAzureCredential, ClientSecretCredential
 import azure.mgmt.securityinsight as si
-import app_logging as al
-import scheduled_rule as sr
-import nrt_rule as nr
-import response_checker as rc
-import deploy_solutions
+import src.app_logging as al
+import src.scheduled_rule as sr
+import src.nrt_rule as nr
+import src.response_checker as rc
+import src.deploy_solutions
 
 # pylint: disable=W1203
 
@@ -62,7 +62,7 @@ class SentinelWorkspace:
             "Content-Type": "application/json",
         }
 
-    deploy_solutions = deploy_solutions.full_solution_deploy
+    deploy_solutions = src.deploy_solutions.full_solution_deploy
 
     def list_rule_content_templates(self):
         """Lists rule content templates in the workspace"""

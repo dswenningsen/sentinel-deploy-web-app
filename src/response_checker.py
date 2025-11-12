@@ -4,7 +4,7 @@ Can eventually be used to handle pagination and API limits
 """
 
 import requests
-import app_logging as al
+import src.app_logging as al
 
 # pylint: disable=W1203
 

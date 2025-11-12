@@ -2,8 +2,8 @@
 
 import glob
 import yaml
-from app_logging import logger
-from sentinel_workspace import SentinelWorkspace
+from src.app_logging import logger
+from src.sentinel_workspace import SentinelWorkspace
 
 # pylint: disable=W1203
 

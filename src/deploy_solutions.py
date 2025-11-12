@@ -1,8 +1,8 @@
 """Deploy and manage content product solutions in a workspace"""
 
 import requests
-import response_checker as rc
-from app_logging import logger
+import src.response_checker as rc
+from src.app_logging import logger
 
 
 # pylint: disable=W1203

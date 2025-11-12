@@ -14,7 +14,7 @@ from pydantic import (
     Field,
     model_validator,
 )
-import scheduled_rule as sr
+import src.scheduled_rule as sr
 
 
 class NrtAlertRuleProperties(BaseModel):
