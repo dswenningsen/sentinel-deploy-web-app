@@ -158,13 +158,22 @@ def deploy_rules_task(
             client_id=workspace_form.get("client_id"),
             client_secret=client_secret,
         )
-        sent_client.deploy_rules()
-        logs.append("All rules deployed successfully.")
-        deployments[deployment_id]["logs"] = logs
-        deployments[deployment_id]["status"] = "Completed"
-        logger.info(
-            f"[deploy_rules_task] All rules deployed for {workspace_form.get('workspace_name')}"
-        )
+        responses = sent_client.deploy_rules()
+        if False not in responses:
+            logs.append("All rules deployed successfully.")
+            deployments[deployment_id]["logs"] = logs
+            deployments[deployment_id]["status"] = "Completed"
+            logger.info(
+                f"[deploy_rules_task] All rules deployed for {workspace_form.get('workspace_name')}"
+            )
+        else:
+            logs.append("Error: Some rules failed to deploy.")
+            logs.append("Check logs for details.")
+            deployments[deployment_id]["logs"] = logs
+            deployments[deployment_id]["status"] = "Error"
+            logger.error(
+                f"[deploy_rules_task] Some rules failed to deploy for {workspace_form.get('workspace_name')}"
+            )
     except Exception as e:
         logs.append(f"Error: {str(e)}")
         deployments[deployment_id]["logs"] = logs

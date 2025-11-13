@@ -10,29 +10,6 @@ import src.template_to_rule as ttr
 # pylint: disable=W1203, W1201, W0718
 
 
-def prepare_template_body(template: dict, source: dict):
-    """Prepare the template body for deployment"""
-    al.logger.info(
-        f"Preparing template body for: {template["properties"]["contentId"]}"
-    )
-    return {
-        "properties": {
-            "contentId": template["properties"]["contentId"],
-            "contentKind": template["properties"]["contentKind"],
-            "contentProductId": template["properties"]["contentProductId"],
-            "displayName": template["properties"]["displayName"],
-            "packageId": template["properties"]["packageId"],
-            "packageVersion": template["properties"]["packageVersion"],
-            "source": source,
-            "version": template["properties"]["version"],
-            "contentSchemaVersion": template["properties"][
-                "contentSchemaVersion"
-            ],
-            "mainTemplate": template["properties"]["mainTemplate"],
-        }
-    }
-
-
 def model_templates_for_deployment(templates: list[dict]):
     """Model rules for deployment"""
     modeled_rules = []
