@@ -1,11 +1,9 @@
 """Service logic for Sentinel workspace and solution deployment tasks."""
 
-import glob
-import yaml
 from src.app_logging import logger
 from src.sentinel_workspace import SentinelWorkspace
 
-# pylint: disable=W1203
+# pylint: disable=W1203, W0718
 
 
 def create_workspace_task(
@@ -136,3 +134,39 @@ def process_solutions_task(
         deployments[deployment_id]["logs"] = logs
         deployments[deployment_id]["status"] = "Error"
         logger.error(f"[process_solutions_task] Exception: {e}")
+
+
+def deploy_rules_task(
+    deployment_id,
+    workspace_form,
+    client_secret,
+    deployments,
+):
+    """Background task to deploy analytic alert rules to the Sentinel workspace."""
+    logs = []
+    try:
+        logger.info(
+            "[deploy_rules_task] Deploying rules to workspace: "
+            f"{workspace_form.get('workspace_name')}"
+        )
+        logs.append("Deploying rules to workspace...")
+        sent_client = SentinelWorkspace(
+            sub_id=workspace_form["subscription_id"],
+            rg_name=workspace_form["resource_group"],
+            ws_name=workspace_form["workspace_name"],
+            tenant_id=workspace_form.get("tenant_id"),
+            client_id=workspace_form.get("client_id"),
+            client_secret=client_secret,
+        )
+        sent_client.deploy_rules()
+        logs.append("All rules deployed successfully.")
+        deployments[deployment_id]["logs"] = logs
+        deployments[deployment_id]["status"] = "Completed"
+        logger.info(
+            f"[deploy_rules_task] All rules deployed for {workspace_form.get('workspace_name')}"
+        )
+    except Exception as e:
+        logs.append(f"Error: {str(e)}")
+        deployments[deployment_id]["logs"] = logs
+        deployments[deployment_id]["status"] = "Error"
+        logger.error(f"[deploy_rules_task] Exception: {e}")

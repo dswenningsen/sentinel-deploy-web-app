@@ -24,8 +24,8 @@ class NrtAlertRuleProperties(BaseModel):
     enabled: bool = Field(default=False)
     query: str
     severity: sr.AlertSeverity
-    suppressionDuration: str
-    suppressionEnabled: bool
+    suppressionDuration: str = "PT5M"
+    suppressionEnabled: bool = False
     alertDetailsOverride: sr.AlertDetailsOverride | None = None
     alertRuleTemplateName: str | None = None
     customDetails: dict | None = None
@@ -34,10 +34,15 @@ class NrtAlertRuleProperties(BaseModel):
     eventGroupingSettings: sr.EventGroupingSettings | None
     incidentConfiguration: sr.IncidentConfiguration | None = None
     sentinelEntitiesMappings: List[sr.SentinelEntityMapping] | None
-    subTechniques: str | None = None
-    tactics: sr.AttackTactic | None = None
-    techniques: str | None = None
+    subTechniques: List[str] | None = None
+    tactics: List[sr.AttackTactic] | None = None
+    techniques: List[str] | None = None
     templateVersion: str | None
+
+    class Config:
+        """Config"""
+
+        use_enum_values = True
 
     @model_validator(mode="before")
     def alter_template_version(cls, values):
@@ -56,6 +61,8 @@ class NrtAlertRuleProperties(BaseModel):
 class NrtAlertRule(BaseModel):
     """Model"""
 
+    id: str | None = None
+    name: str | None = None
     kind: str = Field(default="NRT")
     properties: NrtAlertRuleProperties
     etag: str | None = None

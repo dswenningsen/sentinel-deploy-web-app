@@ -312,7 +312,7 @@ class ScheduledAlertRuleProperties(BaseModel):
     queryPeriod: str
     severity: AlertSeverity
     suppressionDuration: str = "PT5M"
-    suppressionEnabled: bool
+    suppressionEnabled: bool = False
     triggerOperator: TriggerOperator
     triggerThreshold: int
     incidentConfiguration: IncidentConfiguration | None = None

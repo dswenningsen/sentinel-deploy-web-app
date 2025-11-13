@@ -11,7 +11,6 @@ from azure.identity import DefaultAzureCredential, ClientSecretCredential
 import azure.mgmt.securityinsight as si
 import src.app_logging as al
 import src.scheduled_rule as sr
-import src.nrt_rule as nr
 import src.response_checker as rc
 import src.deploy_solutions
 import src.deploy_rules
@@ -208,11 +207,15 @@ class SentinelWorkspace:
             x for x in alerts if x.kind == "MicrosoftSecurityIncidentCreation"
         ]
 
-    def create_alert(self, alert: sr.ScheduledAlertRule, enabled: bool = False):
+    def create_update_alert(
+        self, alert: sr.ScheduledAlertRule, enabled: bool = False
+    ):
         """Create alert in workspace"""
-        resource = self.api_url + f"alertRules/{alert.id}{self.api_version}"
+        al.logger.debug(f"Creating alert: {alert.properties.displayName}")
+        if alert.name == alert.properties.alertRuleTemplateName:
+            alert.name = str(uuid.uuid4())
+        resource = self.api_url + f"alertRules/{alert.name}{self.api_version}"
         alert.properties.enabled = enabled
-        alert.name = alert.id
         body = alert.model_dump()
         body.pop("id", None)
 
@@ -224,46 +227,14 @@ class SentinelWorkspace:
         )
         return rc.response_check(f"Error creating alert {alert.name}", response)
 
-    def create_alerts(self, alerts: list, enabled: bool = False):
+    def create_update_alerts(self, alerts: list, enabled: bool = False):
         """Create a list of alerts in the workspace"""
         responses = []
         for alert in alerts:
-            response = self.create_alert(alert, enabled=enabled)
+            response = self.create_update_alert(alert, enabled=enabled)
             if response is not None:
                 responses.append(response)
         return responses
-
-    # TODO: create option for updating that does not uuid a rule id
-    def template_2_rule(self, template, enabled: bool = False):
-        """Convert a Scheduled Alert Rule Template to a Scheduled Alert Rule"""
-        a = template.model_dump(mode="python")
-        if template.kind == "Scheduled":
-            rule = sr.ScheduledAlertRule(**a)
-        elif template.kind == "NRT":
-            if template.displayName is None and template.name is not None:
-                a["displayName"] = template.name
-            a["properties"]["displayName"] = a.get("displayName")
-            a.pop("displayName")
-            rule = nr.NrtAlertRule(**a)
-        else:
-            al.logger.error(
-                f"Template kind {template.kind} not supported for conversion"
-            )
-            return None
-        rule.properties.enabled = enabled
-        rule.properties.templateVersion = template.properties.version
-        rule.properties.alertRuleTemplateName = rule.id
-        rule.id = str(uuid.uuid4())
-        return rule
-
-    def templates_2_rules(self, templates: list, enabled: bool = False):
-        """Convert a list of Scheduled Alert Rule Templates to Scheduled Alert Rules"""
-        rules = []
-        for template in templates:
-            rule = self.template_2_rule(template, enabled=enabled)
-            if rule is not None:
-                rules.append(rule)
-        return rules
 
     def get_table(self, table_name: str):
         """Get a table from the workspace"""

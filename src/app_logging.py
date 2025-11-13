@@ -67,6 +67,7 @@ logger.addHandler(error_handler)
 logger.addHandler(debug_handler)
 logger.addHandler(warning_handler)
 
+logger.propagate = False
 # Optional: example usage
 # logger.info("This is an info message")
 # logger.error("This is an error message")
