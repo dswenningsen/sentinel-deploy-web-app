@@ -1,14 +1,13 @@
 """Deploy Analytic Rules to Workspace"""
 
-import requests
-import src.response_checker as rc
 import src.app_logging as al
 import src.nrt_rule_template as nrt
 import src.scheduled_rule_template as srt
+import src.template_to_rule as ttr
 
 # import src.sentinel_workspace as sw
 
-# pylint: disable=W1203, W1201
+# pylint: disable=W1203, W1201, W0718
 
 
 def prepare_template_body(template: dict, source: dict):
@@ -41,7 +40,7 @@ def model_templates_for_deployment(templates: list[dict]):
         try:
             al.logger.debug(
                 f"Modeling rule {rule['name']}: "
-                + "{rule['properties']['displayName']}"
+                + f"{rule['properties']['displayName']}"
             )
             if rule["kind"] == "NRT":
                 modeled_rules.append(nrt.NrtRuleTemplate(**rule))
@@ -71,7 +70,6 @@ def deploy_alert_rules(self):
             "properties"
         ]["version"]
         templates_to_deploy.append(content_rule_template)
-    # "type" 'Microsoft.SecurityInsights/AlertRuleTemplates'
-    modeled_rules = model_templates_for_deployment(templates_to_deploy)
-
-    return modeled_rules
+    modeled_templates = model_templates_for_deployment(templates_to_deploy)
+    modeled_rules = ttr.translate_templates_to_rules(modeled_templates, False)
+    return self.create_update_alerts(modeled_rules, enabled=False)

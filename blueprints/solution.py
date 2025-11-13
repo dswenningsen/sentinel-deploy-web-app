@@ -81,11 +81,15 @@ def monitor_solution(deployment_id):
         return "Deployment not found.", 404
     if deployment["status"] == "Completed":
         logger.info(f"Deployment {deployment_id} completed successfully.")
-        return render_template(
-            "solution_selected.html",
-            solution=deployment["logs"],
-            refresh=False,
-            error=False,
+        # On successful solution deployment, prompt user to deploy rules
+        logger.info(
+            f"Redirecting to rules prompt for deployment_id={deployment_id}"
+        )
+        return redirect(
+            url_for(
+                "deploy_rules.prompt_deploy_rules",
+                source_deployment_id=deployment_id,
+            )
         )
     elif deployment["status"] == "Error":
         logger.error(f"Deployment {deployment_id} failed with error.")
