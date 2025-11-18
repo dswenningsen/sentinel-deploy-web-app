@@ -9,6 +9,7 @@ from flask import Flask
 from blueprints.workspace import workspace_bp
 from blueprints.solution import solution_bp
 from blueprints.rules_bp import deploy_rules_bp
+from blueprints.auth_bp import auth_bp
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", str(uuid.uuid4()))
@@ -17,6 +18,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", str(uuid.uuid4()))
 app.register_blueprint(workspace_bp)
 app.register_blueprint(solution_bp)
 app.register_blueprint(deploy_rules_bp)
+app.register_blueprint(auth_bp)
 
 
 def main():
