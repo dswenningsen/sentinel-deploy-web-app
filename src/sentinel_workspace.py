@@ -34,6 +34,7 @@ class SentinelWorkspace:
         access_token: str = None,
         token_cache_user_id: str = None,
     ):
+
         if tenant_id is None or client_id is None or client_secret is None:
             self.credential = DefaultAzureCredential()
         else:
@@ -42,6 +43,7 @@ class SentinelWorkspace:
                 client_id=client_id,
                 client_secret=client_secret,
             )
+        self.access_token = access_token
         self.rg_api_version = "?api-version=2021-04-01"
         self.ws_api_version = "?api-version=2025-02-01"
         self.sent_api_version = "?api-version=2025-03-01"
