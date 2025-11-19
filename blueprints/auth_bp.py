@@ -7,7 +7,8 @@ from flask import Blueprint, redirect, url_for, session, request
 
 auth_bp = Blueprint("auth", __name__)
 
-# Configuration - replace with your values
+# TODO: change to env vars
+# TODO: add MSAL_CACHE_DIR to env vars
 CLIENT_ID = os.environ.get("MSAL_CLIENT_ID", "YOUR_CLIENT_ID")
 AUTHORITY = (
     "https://login.microsoftonline.com/common"  # Use '/common' for multi-tenant
@@ -31,6 +32,7 @@ def get_msal_app():
     )
 
 
+# TODO: add cleanup function
 def save_token_cache(msal_app):
     """Save the token cache to session."""
     if msal_app.token_cache:
@@ -40,7 +42,9 @@ def save_token_cache(msal_app):
         try:
             import os, tempfile
 
-            cache_dir = os.environ.get("MSAL_CACHE_DIR") or tempfile.gettempdir()
+            cache_dir = (
+                os.environ.get("MSAL_CACHE_DIR") or tempfile.gettempdir()
+            )
             try:
                 os.makedirs(cache_dir, exist_ok=True)
             except Exception:
