@@ -19,7 +19,7 @@ workspace_bp = Blueprint("workspace", __name__)
 deployments = {}
 
 
-@workspace_bp.route("/", methods=["GET", "POST"])
+@workspace_bp.route("/registered-app", methods=["GET", "POST"])
 def collect_workspace_info():
     """Display workspace information form and handle user input for
     workspace/solution deployment."""
@@ -30,8 +30,9 @@ def collect_workspace_info():
         resource_group = request.form["resource_group"]
         workspace_name = request.form["workspace_name"]
         region = request.form["region"]
-        client_id = request.form["client_id"]
-        client_secret = request.form["client_secret"]
+        # client_id/client_secret may be omitted for logged-in users
+        client_id = request.form.get("client_id")
+        client_secret = request.form.get("client_secret")
         tenant_id = request.form["tenant_id"]
         session["workspace_form"] = {
             "subscription_id": subscription_id,
@@ -45,6 +46,12 @@ def collect_workspace_info():
         # Do not start workspace creation here; go to RG/LAW creation page
         return redirect(url_for("workspace.create_rg_law"))
     return render_template("form.html")
+
+
+@workspace_bp.route("/form_no_creds", methods=["GET"])
+def form_no_creds():
+    """Render the same form but hide client id/secret fields for logged-in users."""
+    return render_template("form.html", hide_creds=True)
 
 
 @workspace_bp.route("/create_rg_law", methods=["GET", "POST"])
@@ -62,6 +69,10 @@ def create_rg_law():
         # Otherwise, start workspace creation as before
         workspace_form = session.get("workspace_form")
         client_secret = session.get("client_secret")
+        # pass user id (UID) to worker; worker will read cache from MSAL_CACHE_DIR
+        user = session.get("user") or {}
+        user_id = user.get("sub") or user.get("oid")
+
         deployment_id = str(uuid.uuid4())
         deployments[deployment_id] = {"status": "In Progress", "logs": []}
         logger.info(
@@ -79,6 +90,7 @@ def create_rg_law():
                 client_secret,
                 workspace_form["tenant_id"],
                 deployments,
+                user_id,
                 create_rg,
                 create_law,
             ),

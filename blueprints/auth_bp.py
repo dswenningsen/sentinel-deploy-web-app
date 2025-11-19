@@ -34,7 +34,32 @@ def get_msal_app():
 def save_token_cache(msal_app):
     """Save the token cache to session."""
     if msal_app.token_cache:
-        session["token_cache"] = json.dumps(msal_app.token_cache.serialize())
+        serialized = json.dumps(msal_app.token_cache.serialize())
+        session["token_cache"] = serialized
+        # persist to a secure file whose directory is set by env var
+        try:
+            import os, tempfile
+
+            cache_dir = os.environ.get("MSAL_CACHE_DIR") or tempfile.gettempdir()
+            try:
+                os.makedirs(cache_dir, exist_ok=True)
+            except Exception:
+                pass
+            # determine user id from id token claims
+            user = session.get("user") or {}
+            user_id = user.get("sub") or user.get("oid")
+            if user_id:
+                filename = f"msalcache_{user_id}.json"
+                path = os.path.join(cache_dir, filename)
+                with open(path, "w") as f:
+                    f.write(serialized)
+                try:
+                    os.chmod(path, 0o600)
+                except Exception:
+                    pass
+        except Exception:
+            # fall back to session-only cache
+            pass
 
 
 @auth_bp.route("/login")
@@ -47,6 +72,12 @@ def login():
     return redirect(auth_url)
 
 
+@auth_bp.route("/")
+def root_login():
+    """Root path serves as login entrypoint."""
+    return redirect(url_for("auth.login"))
+
+
 @auth_bp.route("/getAToken")
 def authorized():
     """Handle the redirect from Azure AD and acquire token."""
@@ -56,16 +87,35 @@ def authorized():
     )
     if "access_token" in result:
         session["user"] = result.get("id_token_claims")
-        session["access_token"] = result["access_token"]
         session["authenticated"] = True
         save_token_cache(msal_app)
-        return redirect(url_for("workspace.collect_workspace_info"))
+        return redirect(url_for("workspace.form_no_creds"))
     else:
-        return f"Token acquisition failed: {result.get('error_description')}"
+        return redirect(url_for("workspace.collect_workspace_info"))
 
 
 @auth_bp.route("/logout")
 def logout():
     """Logout user."""
+    # remove any token cache file we created
+    try:
+        import os
+
+        user = session.get("user") or {}
+        user_id = user.get("sub") or user.get("oid")
+        if user_id:
+            cache_dir = os.environ.get("MSAL_CACHE_DIR")
+            if not cache_dir:
+                import tempfile
+
+                cache_dir = tempfile.gettempdir()
+            path = os.path.join(cache_dir, f"msalcache_{user_id}.json")
+            if os.path.exists(path):
+                try:
+                    os.remove(path)
+                except Exception:
+                    pass
+    except Exception:
+        pass
     session.clear()
     return redirect(url_for("auth.login"))
