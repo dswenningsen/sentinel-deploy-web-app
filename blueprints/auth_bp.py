@@ -7,27 +7,22 @@ from flask import Blueprint, redirect, url_for, session, request
 
 auth_bp = Blueprint("auth", __name__)
 
-# TODO: change to env vars
-# TODO: add MSAL_CACHE_DIR to env vars
-CLIENT_ID = os.environ.get("MSAL_CLIENT_ID", "YOUR_CLIENT_ID")
-AUTHORITY = (
-    "https://login.microsoftonline.com/common"  # Use '/common' for multi-tenant
-)
-SCOPE = ["https://management.azure.com/.default"]  # Adjust scope as needed
-REDIRECT_URI = "http://localhost:5000/getAToken"  # Adjust for your app
+CLIENT_ID = os.environ.get("MSAL_CLIENT_ID")
+AUTHORITY = os.environ.get("AUTHORITY")  # Use '/common' for multi-tenant
+SCOPE = [os.environ.get("SCOPE")]  # Adjust scope as needed
+REDIRECT_URI = os.environ.get("REDIRECT_URI")  # Adjust for your app
 
 
 # Function to get MSAL app instance with token cache
 def get_msal_app():
+    """Create and return a MSAL ConfidentialClientApplication instance."""
     cache = msal.SerializableTokenCache()
     if "token_cache" in session:
         cache.deserialize(json.loads(session["token_cache"]))
     return msal.ConfidentialClientApplication(
         CLIENT_ID,
         authority=AUTHORITY,
-        client_credential=os.environ.get(
-            "MSAL_CLIENT_SECRET", "YOUR_CLIENT_SECRET"
-        ),
+        client_credential=os.environ.get("MSAL_CLIENT_SECRET"),
         token_cache=cache,
     )
 
@@ -42,9 +37,7 @@ def save_token_cache(msal_app):
         try:
             import os, tempfile
 
-            cache_dir = (
-                os.environ.get("MSAL_CACHE_DIR") or tempfile.gettempdir()
-            )
+            cache_dir = os.environ.get("MSAL_CACHE_DIR")
             try:
                 os.makedirs(cache_dir, exist_ok=True)
             except Exception:
