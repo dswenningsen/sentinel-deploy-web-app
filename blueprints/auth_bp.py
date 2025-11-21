@@ -4,28 +4,30 @@ import os
 import json
 import msal
 from flask import Blueprint, redirect, url_for, session, request
-import src.app_logging as al
-
-# pylint: disable=W1203
 
 auth_bp = Blueprint("auth", __name__)
 
-CLIENT_ID = os.environ.get("MSAL_CLIENT_ID")
-AUTHORITY = os.environ.get("AUTHORITY")  # Use '/common' for multi-tenant
-SCOPE = [os.environ.get("SCOPE")]  # Adjust scope as needed
-REDIRECT_URI = os.environ.get("REDIRECT_URI")  # Adjust for your app
+# TODO: change to env vars
+# TODO: add MSAL_CACHE_DIR to env vars
+CLIENT_ID = os.environ.get("MSAL_CLIENT_ID", "YOUR_CLIENT_ID")
+AUTHORITY = (
+    "https://login.microsoftonline.com/common"  # Use '/common' for multi-tenant
+)
+SCOPE = ["https://management.azure.com/.default"]  # Adjust scope as needed
+REDIRECT_URI = "http://localhost:5000/getAToken"  # Adjust for your app
 
 
 # Function to get MSAL app instance with token cache
 def get_msal_app():
-    """Create and return a MSAL ConfidentialClientApplication instance."""
     cache = msal.SerializableTokenCache()
     if "token_cache" in session:
         cache.deserialize(json.loads(session["token_cache"]))
     return msal.ConfidentialClientApplication(
         CLIENT_ID,
         authority=AUTHORITY,
-        client_credential=os.environ.get("MSAL_CLIENT_SECRET"),
+        client_credential=os.environ.get(
+            "MSAL_CLIENT_SECRET", "YOUR_CLIENT_SECRET"
+        ),
         token_cache=cache,
     )
 
@@ -40,7 +42,9 @@ def save_token_cache(msal_app):
         try:
             import os, tempfile
 
-            cache_dir = os.environ.get("MSAL_CACHE_DIR")
+            cache_dir = (
+                os.environ.get("MSAL_CACHE_DIR") or tempfile.gettempdir()
+            )
             try:
                 os.makedirs(cache_dir, exist_ok=True)
             except Exception:
@@ -51,18 +55,12 @@ def save_token_cache(msal_app):
             if user_id:
                 filename = f"msalcache_{user_id}.json"
                 path = os.path.join(cache_dir, filename)
-                al.logger.debug(f"Saving token cache to {path}")
                 with open(path, "w") as f:
                     f.write(serialized)
                 try:
                     os.chmod(path, 0o600)
-                    al.logger.info(
-                        f"Token cache saved to {path} with restricted permissions"
-                    )
-                except Exception as e:
-                    al.logger.warning(
-                        f"Failed to set restricted permissions on token cache file {path}: {e}"
-                    )
+                except Exception:
+                    pass
         except Exception:
             # fall back to session-only cache
             pass

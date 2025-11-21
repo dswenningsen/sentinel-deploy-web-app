@@ -85,9 +85,6 @@ class SentinelWorkspace:
                 result = msal_app.acquire_token_silent(
                     ["https://management.azure.com/.default"], account=None
                 )
-                al.logger.info(
-                    f"Acquired token from cache using msal: {token_cache_user_id}"
-                )
                 token = (
                     result["access_token"]
                     if result and "access_token" in result
@@ -131,7 +128,6 @@ class SentinelWorkspace:
         """
         Retrieves access token for a specified scope using stored credentials.
         """
-        al.logger.info("Getting access token from azure identity")
         token = self.credential.get_token(scope)
         return token.token
 
