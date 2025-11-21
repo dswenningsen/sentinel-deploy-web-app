@@ -31,7 +31,10 @@ class SentinelWorkspace:
         tenant_id=None,
         client_id=None,
         client_secret=None,
+        access_token: str = None,
+        token_cache_user_id: str = None,
     ):
+
         if tenant_id is None or client_id is None or client_secret is None:
             self.credential = DefaultAzureCredential()
         else:
@@ -40,6 +43,7 @@ class SentinelWorkspace:
                 client_id=client_id,
                 client_secret=client_secret,
             )
+        self.access_token = access_token
         self.rg_api_version = "?api-version=2021-04-01"
         self.ws_api_version = "?api-version=2025-02-01"
         self.sent_api_version = "?api-version=2025-03-01"
@@ -56,9 +60,45 @@ class SentinelWorkspace:
             f"providers/Microsoft.OperationalInsights/workspaces/{self.workspace_name}"
             "/providers/Microsoft.SecurityInsights/"
         )
+        if self.access_token:
+            token = self.access_token
+        elif token_cache_user_id:
+            try:
+                import msal, json, os, tempfile
+
+                cache = msal.SerializableTokenCache()
+                cache_dir = (
+                    os.environ.get("MSAL_CACHE_DIR") or tempfile.gettempdir()
+                )
+                cache_path = os.path.join(
+                    cache_dir, f"msalcache_{token_cache_user_id}.json"
+                )
+                if os.path.exists(cache_path):
+                    with open(cache_path, "r") as f:
+                        cache.deserialize(json.loads(f.read()))
+                msal_app = msal.ConfidentialClientApplication(
+                    os.environ.get("MSAL_CLIENT_ID"),
+                    authority="https://login.microsoftonline.com/common",
+                    client_credential=os.environ.get("MSAL_CLIENT_SECRET"),
+                    token_cache=cache,
+                )
+                result = msal_app.acquire_token_silent(
+                    ["https://management.azure.com/.default"], account=None
+                )
+                token = (
+                    result["access_token"]
+                    if result and "access_token" in result
+                    else None
+                )
+            except Exception:
+                token = None
+        else:
+            token = self.get_access_token(
+                "https://management.azure.com/.default"
+            )
+
         self.headers = {
-            "Authorization": "Bearer "
-            + f"{self.get_access_token('https://management.azure.com/.default')}",
+            "Authorization": "Bearer " + f"{token}",
             "Content-Type": "application/json",
         }
 
