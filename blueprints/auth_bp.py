@@ -4,6 +4,9 @@ import os
 import json
 import msal
 from flask import Blueprint, redirect, url_for, session, request
+import src.app_logging as al
+
+# pylint: disable=W1203
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -48,12 +51,18 @@ def save_token_cache(msal_app):
             if user_id:
                 filename = f"msalcache_{user_id}.json"
                 path = os.path.join(cache_dir, filename)
+                al.logger.debug(f"Saving token cache to {path}")
                 with open(path, "w") as f:
                     f.write(serialized)
                 try:
                     os.chmod(path, 0o600)
-                except Exception:
-                    pass
+                    al.logger.info(
+                        f"Token cache saved to {path} with restricted permissions"
+                    )
+                except Exception as e:
+                    al.logger.warning(
+                        f"Failed to set restricted permissions on token cache file {path}: {e}"
+                    )
         except Exception:
             # fall back to session-only cache
             pass
