@@ -60,6 +60,7 @@ class SentinelWorkspace:
             f"providers/Microsoft.OperationalInsights/workspaces/{self.workspace_name}"
             "/providers/Microsoft.SecurityInsights/"
         )
+        # TODO: Add as option with client secret and default
         if self.access_token:
             token = self.access_token
         elif token_cache_user_id:
