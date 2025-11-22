@@ -60,7 +60,6 @@ class SentinelWorkspace:
             f"providers/Microsoft.OperationalInsights/workspaces/{self.workspace_name}"
             "/providers/Microsoft.SecurityInsights/"
         )
-        # TODO: Add as option with client secret and default
         if self.access_token:
             token = self.access_token
         elif token_cache_user_id:
@@ -83,8 +82,10 @@ class SentinelWorkspace:
                     client_credential=os.environ.get("MSAL_CLIENT_SECRET"),
                     token_cache=cache,
                 )
-                result = msal_app.acquire_token_silent(
-                    ["https://management.azure.com/.default"], account=None
+                accounts = msal_app.get_accounts()
+                account = accounts[0] if accounts else None
+                result = msal_app.acquire_token_silent_with_error(
+                    ["https://management.azure.com/.default"], account=account
                 )
                 token = (
                     result["access_token"]

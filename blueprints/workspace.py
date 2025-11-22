@@ -41,6 +41,7 @@ def collect_workspace_info():
             "region": region,
             "client_id": client_id,
             "tenant_id": tenant_id,
+            "user_id": session.get("user_id"),
         }
         session["client_secret"] = client_secret
         # Do not start workspace creation here; go to RG/LAW creation page
@@ -51,6 +52,8 @@ def collect_workspace_info():
 @workspace_bp.route("/form_no_creds", methods=["GET"])
 def form_no_creds():
     """Render the same form but hide client id/secret fields for logged-in users."""
+    user_id = request.args.get("user_id")
+    session["user_id"] = request.args.get("user_id")
     return render_template("form.html", hide_creds=True)
 
 
@@ -70,8 +73,6 @@ def create_rg_law():
         workspace_form = session.get("workspace_form")
         client_secret = session.get("client_secret")
         # pass user id (UID) to worker; worker will read cache from MSAL_CACHE_DIR
-        user = session.get("user") or {}
-        user_id = user.get("sub") or user.get("oid")
 
         deployment_id = str(uuid.uuid4())
         deployments[deployment_id] = {"status": "In Progress", "logs": []}
@@ -90,7 +91,7 @@ def create_rg_law():
                 client_secret,
                 workspace_form["tenant_id"],
                 deployments,
-                user_id,
+                workspace_form["user_id"],
                 create_rg,
                 create_law,
             ),

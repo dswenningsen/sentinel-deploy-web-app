@@ -16,6 +16,7 @@ def create_workspace_task(
     client_secret,
     tenant_id,
     deployments,
+    token_cache_user_id=None,
     create_rg=False,
     create_law=False,
 ):
@@ -32,6 +33,7 @@ def create_workspace_task(
             f"create_law={create_law})"
         )
         logs.append("Initializing Sentinel Workspace creation...")
+        # Let SentinelWorkspace load the cache/token if a user id was provided
         workspace = SentinelWorkspace(
             sub_id=subscription_id,
             rg_name=resource_group,
@@ -39,6 +41,7 @@ def create_workspace_task(
             tenant_id=tenant_id,
             client_id=client_id,
             client_secret=client_secret,
+            token_cache_user_id=token_cache_user_id,
         )
         if create_rg and create_law:
             # Pass create_rg and create_law to your workspace creation logic as needed
@@ -104,6 +107,7 @@ def process_solutions_task(
     client_secret,
     selected_solutions,
     deployments,
+    token_cache_user_id=None,
 ):
     """Background task to deploy selected solutions to the Sentinel workspace."""
     logs = []
@@ -119,6 +123,7 @@ def process_solutions_task(
             tenant_id=workspace_form["tenant_id"],
             client_id=workspace_form["client_id"],
             client_secret=client_secret,
+            access_token=None,
         )
         sent_client.deploy_solutions(
             workspace_form["region"], selected_solutions
@@ -141,6 +146,7 @@ def deploy_rules_task(
     workspace_form,
     client_secret,
     deployments,
+    token_cache_user_id=None,
 ):
     """Background task to deploy analytic alert rules to the Sentinel workspace."""
     logs = []
@@ -157,6 +163,7 @@ def deploy_rules_task(
             tenant_id=workspace_form.get("tenant_id"),
             client_id=workspace_form.get("client_id"),
             client_secret=client_secret,
+            access_token=None,
         )
         responses = sent_client.deploy_rules()
         if False not in responses:
