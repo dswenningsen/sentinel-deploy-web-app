@@ -107,7 +107,6 @@ def process_solutions_task(
     client_secret,
     selected_solutions,
     deployments,
-    token_cache_user_id=None,
 ):
     """Background task to deploy selected solutions to the Sentinel workspace."""
     logs = []
@@ -124,6 +123,7 @@ def process_solutions_task(
             client_id=workspace_form["client_id"],
             client_secret=client_secret,
             access_token=None,
+            token_cache_user_id=workspace_form["user_id"],
         )
         sent_client.deploy_solutions(
             workspace_form["region"], selected_solutions
@@ -146,7 +146,6 @@ def deploy_rules_task(
     workspace_form,
     client_secret,
     deployments,
-    token_cache_user_id=None,
 ):
     """Background task to deploy analytic alert rules to the Sentinel workspace."""
     logs = []
@@ -164,6 +163,7 @@ def deploy_rules_task(
             client_id=workspace_form.get("client_id"),
             client_secret=client_secret,
             access_token=None,
+            token_cache_user_id=workspace_form["user_id"],
         )
         responses = sent_client.deploy_rules()
         if False not in responses:
