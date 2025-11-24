@@ -92,9 +92,8 @@ class SentinelWorkspace:
                     if result and "access_token" in result
                     else None
                 )
-                # TODO: remove for production
                 al.logger.debug(
-                    f"Token acquired from cache for user {token_cache_user_id}:{token}"
+                    f"Token acquired from cache for user {token_cache_user_id}"
                 )
             except Exception:
                 token = None
