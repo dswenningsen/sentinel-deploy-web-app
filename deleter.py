@@ -21,8 +21,8 @@ sc = sw.SentinelWorkspace(
     client_id="f41b6ba9-813b-4096-b769-e3b03e4a0d4c",
     client_secret="",
     sub_id="25bce547-25db-47a6-a2bc-54e836303446",
-    rg_name=f"rg-1",
-    ws_name=f"ws-1",
+    rg_name=f"rg-clear",
+    ws_name=f"ws-clear",
 )
 sc.delete_sentinel_solution()
 
